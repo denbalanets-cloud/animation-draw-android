@@ -7,14 +7,13 @@ const BM=[['source-over','Нормальный'],['multiply','Умножение
 
 let cur=0, act=1, ref=1, tool='brush', color='#000000', size=6, hard=1, tol=40, gap=4, grow=2, onion=true, fps=12, playing=false, pend=null, clip=null, lpOn=false, jrOn=false, tlOn=true, bo=1, rot=0, pid='p'+Date.now(), name='Проект 1';
 let selMode='rect', selOp='add', shape='rect', shapeFill=false, shapeRadius=0;
-let selection=null; // {x,y,w,h} или массив точек
+let selection=null; 
 
 const U=[], R=[];
 const PAL=['#000000','#ffffff','#e53935','#1e88e5','#43a047','#fdd835','#8e24aa','#757575'];
 const cv=$('cv'), cx=cv.getContext('2d'); let z=1, px=0, py=0, fitted=false;
 const lc=()=>{const c=LS[act].c;return c[cur%c.length].getContext('2d')};
 
-// SVG иконки
 const IC={
  brush:'<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a.9959.9959 0 00-1.41 0L9 12.25 11.75 15l8.96-8.96a.9959.9959 0 000-1.41z"/></svg>',
  eraser:'<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.78-.78 2.05 0 2.83L5.74 20.7c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l11.14-11.14c.39-.39.59-.9.59-1.41 0-.51-.2-1.02-.59-1.41l-3.15-3.15c-.39-.39-.9-.59-1.41-.59zM5.74 19.29L3.3 16.85l5.66-5.66 2.44 2.44-5.66 5.66z"/></svg>',
@@ -63,12 +62,12 @@ async function openLastProject() {
 
 function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;if(!fitted&&r.width){z=Math.min(r.width/W,r.height/H)*.95;px=(r.width-W*z)/2;py=(r.height-H*z)/2;fitted=true}render()}
 function drawF(c,f,pd){f.l.forEach((l,i)=>{const L=LS[i];if(!L.v)return;let s=l;if(L.cl&&i>0){s=mk();const t=s.getContext('2d');t.drawImage(l,0,0);t.globalCompositeOperation='destination-in';t.drawImage(f.l[i-1],0,0)}c.save();c.globalAlpha*=L.o;c.globalCompositeOperation=L.bm;if(pd&&i===act)c.transform(pd.a,pd.b,pd.c,pd.d,pd.e,pd.f);c.drawImage(s,0,0);c.restore()})}
-const B=(a,t,v,on)=>`<button data-a="${a}"${v!==undefined?` data-v="${v}"`:''}${on?' class="on"':''} title="${t}">${t}</button>`;
+const B=(a,t,v,on)=>`<button data-a="${a}"${v!==undefined?` data-v="${v}"`:''}${on?' class="on"':''} title="${typeof t === 'string' && t.startsWith('<svg') ? '' : t}">${t}</button>`;
 const S=(k,t,mn,mx,v)=>`<label>${t}<span><input type=number inputmode=numeric data-s=${k} min=${mn} max=${mx} value=${v}>${{size:' px',bo:' %',hard:' %',gap:' px',grow:' px',shapeRadius:' %'}[k]||''}</span></label>`;
 
 function ui(){
  $('act').innerHTML=B('undo','Отмена')+B('redo','Повтор')+B('jr','Журнал',undefined,jrOn)+(pend?B('commit','Применить',undefined,1)+B('cancelT','Сброс'):'')+B('menuBack','Меню'); 
- $('menu').innerHTML=B('projects','Проекты')+B('rr','Сброс')+B('lay','Слои',undefined,lpOn)+B('tlt','Кадры',undefined,tlOn);
+ $('menu').innerHTML=B('projects','Проекты')+B('rr','Сброс')+B('lay','Слои',undefined,lpOn)+B('tlt','Кадры',undefined,tlOn)+B('toggleUI','Скрыть панели');
  $('tc').style.display=tlOn?'flex':'none';$('fr').style.display=tlOn?'block':'none';
  $('sb').innerHTML=SB();
  let opt='';
@@ -100,7 +99,7 @@ function fill(p){const x0=p.x|0,y0=p.y|0;if(x0<0||y0<0||x0>=W||y0>=H)return;push
  c.putImageData(im,0,0);changed()}
 
 const ptr=new Map();let drawing=null,start=null,moved=0,multi=false,d0=null;
-const pt=e=>{const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;return{x:(e.clientX-r.left)*d,y:(e.clientY-r.top)*d}};
+const pt=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
 const toC=p=>{const dx=p.x-px,dy=p.y-py,cs=Math.cos(-rot),sn=Math.sin(-rot);return{x:(dx*cs-dy*sn)/z,y:(dx*sn+dy*cs)/z}};
 const pr=e=>e.pointerType==='pen'?Math.max(.1,e.pressure):1;
 function seg(a,b,w){const c=lc();c.lineCap=c.lineJoin='round';c.globalCompositeOperation=tool==='eraser'?'destination-out':LS[act].al?'source-atop':'source-over';c.globalAlpha=bo;c.strokeStyle=c.fillStyle=color;c.lineWidth=w;c.shadowBlur=hard<1?size*(1-hard):0;c.shadowColor=color;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x+.01,b.y);c.stroke();c.globalCompositeOperation='source-over';c.globalAlpha=1;c.shadowBlur=0}
@@ -128,110 +127,4 @@ cv.onpointermove=e=>{if(!ptr.has(e.pointerId))return;const o=ptr.get(e.pointerId
  else if(tool==='transform'){pend=new DOMMatrix().translate(toC(n).x-toC(o).x,toC(n).y-toC(o).y).multiply(pend||new DOMMatrix());render();ui()}
  else if(tool==='hand'){px+=n.x-o.x;py+=n.y-o.y;render()}};
 
-cv.onpointerup=cv.onpointercancel=e=>{ptr.delete(e.pointerId);if(ptr.size)return;
- if(drawing){drawing=null;changed()}
- else if(tool==='fill'&&!multi&&!moved&&start)fill(toC(start));
- if(pend)ui()};
-
-// Заготовки для градиента и палочки (пока базовые)
-function gradient(){}
-function magicWand(){}
-
-const A={
- tool:v=>{tool=v;ui()},color:v=>{color=v;ui()},lay:()=>{lpOn=!lpOn;ui()},rr:()=>{rot=0;fitted=false;fit()},eye:v=>{LS[v].v=+!LS[v].v;ui();render();tl()},ref:()=>{ref=(ref+1)%LS.length;ui()},lcl:()=>{LS[act].cl=+!LS[act].cl;ui();render();tl()},lal:()=>{LS[act].al=+!LS[act].al;ui()},lup:()=>lm(1),ldn:()=>lm(-1),
- undo:()=>undo(),redo:()=>redo(),jr:()=>{jrOn=!jrOn;ui()},jgo:v=>{const t=+v;while(U.length>t)undo();while(U.length<t&&R.length)redo();jpr()},tlt:()=>{tlOn=!tlOn;ui();fit()},
- commit:()=>{if(!pend)return;push('Трансформ');const c=lc(),t=mk();t.getContext('2d').drawImage(c.canvas,0,0);c.clearRect(0,0,W,H);c.save();c.transform(pend.a,pend.b,pend.c,pend.d,pend.e,pend.f);c.drawImage(t,0,0);c.restore();pend=null;ui();changed()},
- cancelT:()=>{pend=null;ui();render()},
- onion:()=>{onion=!onion;ui();render()},fps:()=>{fps={6:8,8:12,12:24,24:6}[fps]||12;ui();save()},
- play:()=>{playing=!playing;ui();if(playing)tick();else render()},
- projects:openList,close:()=>$('pl').style.display='none',
- openp:async v=>{const p=await dbDo('readonly',s=>s.get(v));if(p){await save();await loadP(p);A.close()}},
- delp:async v=>{await dbDo('readwrite',s=>s.delete(v));openList()},
- savef:async()=>{const ok=await saveFile((name||'project')+'.json',JSON.stringify(await ser()));$('st').textContent=ok?'Файл сохранён':'Отменено'},
- openf:()=>$('fi').click(),
- menuBack:()=>{save(); showStart()},
- shape_rect:()=>{shape='rect';ui()}, shape_circle:()=>{shape='circle';ui()}, shape_poly:()=>{shape='poly';ui()},
- shape_fill:()=>{shapeFill=!shapeFill;ui()},
- sel_rect:()=>{selMode='rect';ui()}, sel_lasso:()=>{selMode='lasso';ui()},
- sel_add:()=>{selOp='add';ui()}, sel_sub:()=>{selOp='sub';ui()}
-};
-
-function SB(){return `<input type=color data-s=col value=${color} class=cc>`+PAL.map(c=>`<button class='sw${c===color?' on':''}' style='background:${c}' data-a=color data-v=${c}></button>`).join('')+`<label>px<input type=number data-s=size min=1 max=500 value=${size}></label><label>%<input type=number data-s=bo min=1 max=100 value=${Math.round(bo*100)}></label>`}
-function jpr(){const p=$('jp');if(!jrOn){p.style.display='none';return}p.style.display='block';const all=U.map(u=>u.n).concat(R.slice().reverse().map(r=>r.n));p.innerHTML=all.length?all.map((n,i)=>`<div class=pi style='opacity:${i<U.length?1:.5}'>`+B('jgo',(i+1)+'. '+n,i+1,i+1===U.length)+`</div>`).join(''):'<p>Журнал пуст</p>'}
-function lpr(){const p=$('lp');if(!lpOn){p.style.display='none';return}const L=LS[act];p.style.display='block';
- p.innerHTML=`<div class='row' style='padding:0 0 6px'>`+B('ladd','+')+B('ldel','Удалить')+B('lup','↑')+B('ldn','↓')+B('lcl','Обрезка',undefined,L.cl)+B('lal','Альфа',undefined,L.al)+`</div><label style='align-items:stretch;margin-bottom:6px'>Непрозрачность ${Math.round(L.o*100)}%<input type=number data-s=lo min=0 max=100 value=${Math.round(L.o*100)}></label><select data-s=bm>`+BM.map(([k,t])=>`<option value=${k}${k===L.bm?' selected':''}>${t}</option>`).join('')+`</select>`+LS.map((l,i)=>i).reverse().map(i=>`<div class=pi>`+B('eye',LS[i].v?'Вкл':'Выкл',i)+`<button data-a=layer data-v=${i}${i===act?' class=on':''} style='flex:1;text-align:left'>${LS[i].n}</button></div>`).join('')}
-
-document.onclick=e=>{const b=e.target.closest('[data-a]');if(b)A[b.dataset.a](b.dataset.v)};
-document.oninput=e=>{const k=e.target.dataset.s;if(!k)return;if(e.target.value==='')return;const v=+e.target.value;({size:()=>size=Math.max(1,v),hard:()=>hard=Math.min(1,Math.max(0,v/100)),tol:()=>tol=v,gap:()=>gap=v,grow:()=>grow=v,bo:()=>bo=Math.min(1,Math.max(.01,v/100)),col:()=>{color=e.target.value},lc:()=>{},lo:()=>{LS[act].o=v/100;render();tl()},bm:()=>{LS[act].bm=e.target.value;render();tl()},shapeRadius:()=>shapeRadius=v})[k]()};
-$('nm').oninput=e=>{name=e.target.value;changed()};
-
-const dbp=new Promise(r=>{try{const q=indexedDB.open('animdraw',1);q.onupgradeneeded=()=>q.result.createObjectStore('p',{keyPath:'id'});q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
-async function dbDo(m,fn){const d=await dbp;if(!d)return null;return new Promise(r=>{try{const t=d.transaction('p',m),q=fn(t.objectStore('p'));t.oncomplete=()=>r(q&&q.result);t.onerror=()=>r(null)}catch(e){r(null)}})}
-const img=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(i);i.src=s});
-async function save(){const d=await ser();const ok=await dbDo('readwrite',s=>s.put(d));try{localStorage.setItem('animdraw_last',pid)}catch(e){}$('st').textContent=ok===null?'Не сохранено':'Сохранено'}
-
-async function openList(){const all=(await dbDo('readonly',s=>s.getAll()))||[];all.sort((a,b)=>b.updated-a.updated);
- $('pc').innerHTML=B('newp','+ Новый проект')+B('savef','Сохранить файл')+B('openf','Открыть файл')+B('png','PNG кадра')+B('close','Закрыть')+(all.length?all.map(p=>`<div class="pi"><span>${p.name.replace(/</g,'&lt;')} · ${p.n||(p.frames||[]).length} кадр.</span>${B('openp','Открыть',p.id)}${B('delp','Удалить',p.id)}</div>`).join(''):'<p>Сохранённых проектов пока нет.</p>');$('pl').style.display='flex'}
-
-$('fi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const p=JSON.parse(await f.text());if(!Array.isArray(p.frames)&&!Array.isArray(p.ls))throw 0;p.id='p'+Date.now();await save();await loadP(p);save()}catch(x){$('st').textContent='Неверный файл'}};
-
-async function saveFile(filename,data){
- try{if(typeof claude!=='undefined'&&claude.use){const dl=await claude.use('downloads');if(dl){await dl.save({filename,data});return true}}}catch(e){if(e&&e.code==='declined')return false}
- const blob=data instanceof Blob?data:new Blob([data],{type:'application/json'}),a=document.createElement('a');
- a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);return true}
-
-const cp=c=>{const n=mk();n.getContext('2d').drawImage(c,0,0);return n},ci=()=>cur%LS[act].c.length,K=()=>LS[act].c;
-function T(){return Math.max(...LS.map(L=>L.c.length))}
-function F(t){return{l:LS.map(L=>L.c[((t%L.c.length)+L.c.length)%L.c.length])}}
-function setLen(i,n){const c=LS[i].c;while(c.length<n)c.push(mk());while(c.length>n)c.pop();cur=Math.min(cur,T()-1);ui();changed()}
-function hl(){document.querySelectorAll('#fr canvas').forEach(c=>{const[i,t]=c.dataset.v.split(',').map(Number);c.className='th'+(t===cur&&i===act?' on':t===cur?' cc2':'')+(t<LS[i].c.length?'':' dim')})}
-function render(){const d=devicePixelRatio||1;cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.setTransform(d,0,0,d,0,0);cx.translate(px,py);cx.rotate(rot);cx.scale(z,z);cx.fillStyle='#fff';cx.fillRect(0,0,W,H);
- if(onion&&!playing){const c=K(),n=c.length;if(n>1){cx.globalAlpha=.25;cx.drawImage(c[((cur-1)%n+n)%n],0,0);cx.globalAlpha=1}}
- drawF(cx,F(cur),pend)}
-function tl(){const r=$('fr'),n=T();let h='';for(let i=LS.length-1;i>=0;i--){const L=LS[i];h+=`<div class=lr><div class='ln${i===act?' on':''}' data-a=layer data-v=${i}>${L.n.slice(0,7)}<small>${L.c.length} кадр.</small></div>`;for(let t=0;t<n;t++)h+=`<canvas class='th${t===cur&&i===act?' on':t===cur?' cc2':''}${t<L.c.length?'':' dim'}' width=48 height=27 data-a=cell data-v=${i},${t}></canvas>`;h+='</div>'}
- r.innerHTML=h;r.querySelectorAll('canvas').forEach(c=>{const[i,t]=c.dataset.v.split(',').map(Number),L=LS[i],x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,48,27);x.drawImage(L.c[t%L.c.length],0,0,48,27)})}
-function tick(){if(!playing)return;cur=(cur+1)%T();render();hl();setTimeout(tick,1000/fps)}
-function push(n){R.length=0;const c=lc();U.push({k:c.canvas,n:n||'Действие',d:c.getImageData(0,0,W,H)});if(U.length>20)U.shift()}
-function undo(){const u=U.pop();if(!u)return;const c=u.k.getContext('2d');R.push({k:u.k,n:u.n,d:c.getImageData(0,0,W,H)});c.putImageData(u.d,0,0);changed()}
-function redo(){const r=R.pop();if(!r)return;const c=r.k.getContext('2d');U.push({k:r.k,n:r.n,d:c.getImageData(0,0,W,H)});c.putImageData(r.d,0,0);changed()}
-function lm(d){const j=act+d;if(j<0||j>=LS.length)return;[LS[act],LS[j]]=[LS[j],LS[act]];act=j;U.length=0;ui();changed()}
-
-async function ser(){
-    const previewCv = mk(); const pCtx = previewCv.getContext('2d'); pCtx.fillStyle = '#fff'; pCtx.fillRect(0, 0, W, H); drawF(pCtx, F(cur));
-    const preview = previewCv.toDataURL('image/jpeg', 0.3);
-    return { id: pid, name, fps, n: T(), updated: Date.now(), w: W, h: H, preview: preview, ls: LS.map(L => ({n: L.n, v: L.v, o: L.o, bm: L.bm, al: L.al, cl: L.cl, c: L.c.map(x => x.toDataURL())})) };
-}
-async function loadP(p){
-    W = p.w || 960; H = p.h || 540;
-    const old = !(p.ls && p.ls[0] && p.ls[0].c);
-    const src = (p.ls && p.ls.length ? p.ls : DEF()).map((L, i) => old ? {...L, c: (p.frames || []).map(fr => fr[i]).filter(Boolean)} : L);
-    const out = [];
-    for(const L of src){const cs=[];for(const u of(L.c && L.c.length ? L.c : [null])){const k=mk();if(u)k.getContext('2d').drawImage(await img(u),0,0);cs.push(k)}out.push({n:L.n,v:L.v,o:L.o,bm:L.bm,al:L.al,cl:L.cl,c:cs})}
-    LS.length=0;out.forEach(L=>LS.push(L));
-    act=Math.min(act,LS.length-1);ref=Math.min(ref,LS.length-1);cur=0;
-    name=p.name||'Проект'; pid=p.id; fps=p.fps||12; $('nm').value=name;
-    U.length=0; R.length=0; $('start-screen').style.display = 'none'; $('gallery-screen').style.display = 'none'; $('app-ui').style.display = 'flex'; fitted = false;
-    ui(); fit(); tl(); changed();
-}
-
-Object.assign(A,{
- first:()=>{cur=0;changed()},
- cell:v=>{const[i,t]=v.split(',').map(Number);act=i;cur=t;ui();changed()},
- layer:v=>{act=+v;ui();tl()},
- add:()=>{const k=ci();K().splice(k+1,0,mk());cur=k+1;ui();changed()},
- dup:()=>{const k=ci();K().splice(k+1,0,cp(K()[k]));cur=k+1;ui();changed()},
- copy:()=>{clip=cp(K()[ci()])},
- paste:()=>{if(!clip)return;const k=ci();K().splice(k+1,0,cp(clip));cur=k+1;ui();changed()},
- del:()=>{const c=K();if(c.length<2)return;const k=ci();c.splice(k,1);cur=Math.min(k,c.length-1);ui();changed()},
- left:()=>{const c=K(),k=ci();if(k<1)return;[c[k],c[k-1]]=[c[k-1],c[k]];cur=k-1;changed()},
- right:()=>{const c=K(),k=ci();if(k>=c.length-1)return;[c[k],c[k+1]]=[c[k+1],c[k]];cur=k+1;changed()},
- ladd:()=>{LS.splice(act+1,0,{n:'Слой '+(LS.length+1),v:1,o:1,bm:'source-over',al:0,cl:0,c:Array.from({length:T()},()=>mk())});act++;U.length=0;ui();changed()},
- ldel:()=>{if(LS.length<2)return;LS.splice(act,1);act=Math.min(act,LS.length-1);ref=Math.min(ref,LS.length-1);cur=Math.min(cur,T()-1);U.length=0;ui();changed()},
- newp:async()=>{await save();LS.length=0;DEF().forEach(L=>LS.push({...L,c:[mk()]}));act=1;ref=1;cur=0;pid='p'+Date.now();name='Проект '+new Date().toLocaleTimeString().slice(0,5);$('nm').value=name;U.length=0;R.length=0;A.close();ui();changed();save()},
- png:()=>{const o=mk(),c=o.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,W,H);drawF(c,F(cur));o.toBlob(b=>saveFile(name+'_'+(cur+1)+'.png',b))}
-});
-
-document.onchange=e=>{if(e.target.dataset.s==='lc'&&e.target.value!=='')setLen(act,Math.max(1,Math.min(500,e.target.value|0)))};
-addEventListener('resize',fit);
-
-(async()=>{ showStart(); })();
+cv.onpointerup=cv.onpointercancel=e=>{ptr.delete(e.pointerId);if(
