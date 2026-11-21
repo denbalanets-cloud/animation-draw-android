@@ -7,7 +7,6 @@ const BM=[['source-over','Нормальный'],['multiply','Умножение
 
 let cur=0, act=1, ref=1, tool='brush', color='#000000', size=6, hard=1, tol=40, gap=4, grow=2, onion=true, fps=12, playing=false, pend=null, clip=null, lpOn=false, jrOn=false, tlOn=true, bo=1, rot=0, pid='p'+Date.now(), name='Проект 1';
 let selMode='rect', selOp='add', shape='rect', shapeFill=false, shapeRadius=0;
-let selection=null; 
 
 const U=[], R=[];
 const PAL=['#000000','#ffffff','#e53935','#1e88e5','#43a047','#fdd835','#8e24aa','#757575'];
@@ -131,9 +130,6 @@ cv.onpointerup=cv.onpointercancel=e=>{ptr.delete(e.pointerId);if(ptr.size)return
  if(drawing){drawing=null;changed()}
  else if(tool==='fill'&&!multi&&!moved&&start)fill(toC(start));
  if(pend)ui()};
-
-function gradient(){}
-function magicWand(){}
 
 const A={
  tool:v=>{tool=v;ui()},color:v=>{color=v;ui()},lay:()=>{lpOn=!lpOn;ui()},rr:()=>{rot=0;fitted=false;fit()},eye:v=>{LS[v].v=+!LS[v].v;ui();render();tl()},ref:()=>{ref=(ref+1)%LS.length;ui()},lcl:()=>{LS[act].cl=+!LS[act].cl;ui();render();tl()},lal:()=>{LS[act].al=+!LS[act].al;ui()},lup:()=>lm(1),ldn:()=>lm(-1),
