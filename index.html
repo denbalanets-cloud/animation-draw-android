@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="css/style.css">
 </head><body>
 
-<!-- Главное меню -->
 <div id="start-screen" style="display:flex; flex-direction:column; height:100%; background:var(--bg); padding:20px; gap:15px; justify-content:center;">
   <h2 style="text-align:center; margin-bottom:20px;">AnimDraw</h2>
   <button class="menu-btn" onclick="openNewCanvas()">Новый холст</button>
@@ -13,7 +12,6 @@
   <button class="menu-btn" onclick="openGallery()">Моя галерея</button>
 </div>
 
-<!-- Экран создания холста -->
 <div id="new-canvas-screen" style="display:none; flex-direction:column; height:100%; background:var(--bg); padding:20px; gap:10px; overflow-y:auto;">
   <h3>Новый холст</h3>
   <label>Ширина <input type="number" id="nc-w" value="1080" style="width:80px"> px</label>
@@ -26,7 +24,6 @@
   </div>
 </div>
 
-<!-- Экран галереи -->
 <div id="gallery-screen" style="display:none; flex-direction:column; height:100%; background:var(--bg); overflow-y:auto;">
   <div class="row" style="padding:10px; justify-content:space-between; align-items:center;">
     <h3 style="margin:0;">Моя галерея</h3>
@@ -35,15 +32,14 @@
   <div id="gal-list" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px;"></div>
 </div>
 
-<!-- Основной интерфейс рисования -->
 <div id="app-ui" style="display:none; flex-direction:column; height:100%;">
-  <div class="row" id="tools"></div>
-  <div class="row" id="opt"></div>
-  <div id="cw"><canvas id="cv"></canvas><div id="sb"></div><span id="st" style="position:absolute;left:66px;top:4px;opacity:.7;font-size:11px"></span></div>
-  <div class="row" id="tc"></div>
-  <div id="fr"></div>
-  <div class="row" id="act"></div>
-  <div class="row" id="menu"></div>
+  <div class="row panel" id="tools"></div>
+  <div class="row panel" id="opt"></div>
+  <div id="cw"><canvas id="cv"></canvas><div id="sb" class="panel"></div><span id="st" style="position:absolute;left:66px;top:4px;opacity:.7;font-size:11px"></span></div>
+  <div class="row panel" id="tc"></div>
+  <div id="fr" class="panel"></div>
+  <div class="row panel" id="act"></div>
+  <div class="row panel" id="menu"></div>
   <div id="lp"></div><div id="jp"></div><div id="pl"><input id="nm" value="Проект 1" style="width:100%;margin-bottom:8px"><div id="pc"></div></div>
   <input type="file" id="fi" accept=".json,application/json" hidden>
 </div>
