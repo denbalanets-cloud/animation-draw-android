@@ -16,9 +16,9 @@
 <!-- Экран создания холста -->
 <div id="new-canvas-screen" style="display:none; flex-direction:column; height:100%; background:var(--bg); padding:20px; gap:10px; overflow-y:auto;">
   <h3>Новый холст</h3>
-  <label>Ширина <input type="number" id="nc-w" value="2100" style="width:80px"> px</label>
-  <label>Высота <input type="number" id="nc-h" value="2800" style="width:80px"> px</label>
-  <label>DPI <input type="number" id="nc-dpi" value="350" style="width:80px"></label>
+  <label>Ширина <input type="number" id="nc-w" value="1080" style="width:80px"> px</label>
+  <label>Высота <input type="number" id="nc-h" value="1920" style="width:80px"> px</label>
+  <label>DPI <input type="number" id="nc-dpi" value="72" style="width:80px"></label>
   <label>Цвет фона <input type="color" id="nc-bg" value="#ffffff"></label>
   <div class="row" style="margin-top:10px;">
     <button onclick="createNewCanvas()">Создать</button>
@@ -35,7 +35,7 @@
   <div id="gal-list" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px;"></div>
 </div>
 
-<!-- Основной интерфейс рисования (скрыт по умолчанию) -->
+<!-- Основной интерфейс рисования -->
 <div id="app-ui" style="display:none; flex-direction:column; height:100%;">
   <div class="row" id="tools"></div>
   <div class="row" id="opt"></div>
