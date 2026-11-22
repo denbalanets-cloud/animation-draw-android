@@ -4,7 +4,7 @@
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{display:flex;flex-direction:column;background:var(--bg);color:var(--t);font:13px system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
 .row{display:flex;gap:4px;padding:4px;overflow-x:auto;align-items:center;flex:none;background:var(--bg)}
-button,.b{background:var(--p);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:8px 10px;font:inherit;white-space:nowrap;flex:none}
+button,.b{background:var(--p);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:6px 8px;font:inherit;white-space:nowrap;flex:none}
 button.on{background:var(--a);color:#fff;border-color:var(--a)}
 #cw{flex:1;min-height:0;position:relative;background:var(--cv)}
 #cv{position:absolute;top:0;bottom:0;left:60px;width:calc(100% - 60px);height:100%;touch-action:none}
@@ -18,7 +18,6 @@ input#nm{background:var(--p);color:var(--t);border:1px solid var(--b);border-rad
 #pl>div{background:var(--p);border-radius:10px;padding:12px;width:min(92vw,420px);max-height:80vh;overflow:auto}
 #sb{position:absolute;left:0;top:0;bottom:0;width:60px;background:var(--p);border-right:1px solid var(--b);display:flex;flex-direction:column;gap:6px;align-items:center;padding:6px 4px;overflow-y:auto;z-index:5}#sb input[type=number]{width:52px}.cc{width:44px;height:44px;border-radius:50%;padding:0;border:2px solid var(--b);flex:none}
 input[type=number]{background:var(--p);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:6px;font:inherit;width:70px}
-#tools button,#act button,#menu button{padding:12px 13px}
 #jp{left:64px!important;right:auto!important}
 #lp,#jp{position:fixed;right:4px;top:calc(env(safe-area-inset-top,0px) + 52px);width:230px;max-height:55vh;overflow:auto;background:var(--p);border:1px solid var(--b);border-radius:10px;padding:8px;display:none;z-index:8}#lp select{width:100%;background:var(--bg);color:var(--t);border:1px solid var(--b);border-radius:6px;padding:8px;margin-bottom:6px;font:inherit}
 #fr{display:block;max-height:32vh;overflow:auto}.lr{display:flex;gap:3px;margin-bottom:3px;width:max-content}.ln{position:sticky;left:0;z-index:2;flex:none;width:62px;background:var(--p);border:1px solid var(--b);border-radius:6px;padding:4px;font-size:11px;display:flex;flex-direction:column;justify-content:center}.ln.on{background:var(--a);color:#fff}#fr .th{width:48px;height:27px}.th.dim{opacity:.4}.th.cc2{border-color:var(--a);opacity:.85}
@@ -29,3 +28,6 @@ input[type=number]{background:var(--p);color:var(--t);border:1px solid var(--b);
 .gal-info { padding: 8px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
 .panel { transition: opacity 0.2s, max-height 0.2s; overflow: hidden; }
 .panel.hidden { display: none !important; }
+#tools button { padding: 6px 8px; }
+#tools svg { width: 20px; height: 20px; }
+#act button, #menu button { padding: 8px 10px; }
